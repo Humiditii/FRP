@@ -16,4 +16,4 @@ jobs:
           username: ubuntu
           host: 63.34.152.195
           key: ${{ secrets.PRIVATE_KEY }}
-          script: 'sudo ./deployer.sh'
+          script: 'sudo su && cd ~/FRP && ./deployer.sh'
