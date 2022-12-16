@@ -1,7 +1,5 @@
 echo "Deploying application ..."
 
-cd ~/FRP
-
 git reset --hard origin/main
 
 git pull origin main
