@@ -84,4 +84,6 @@ export class AuthService {
     }
   }
 
+  async checkProfile():Promise<any>{}
+
 }
