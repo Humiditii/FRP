@@ -1,0 +1,19 @@
+name: Course-recmmender
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  Node-deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Deploy to main branch
+      uses: appleboy/ssh-action@master
+      with:
+          username: ubuntu
+          host: 63.34.152.195
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: 'sudo ./deployer.sh'
