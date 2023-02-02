@@ -8,4 +8,6 @@ pm2 stop frp
 
 npm install
 
+npm run build
+
 pm2 restart frp
