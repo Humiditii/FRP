@@ -48,6 +48,7 @@ export class AssessmentService {
       if(!user_asse){
         return await new this.assessmentModel(payload).save()
       }
+      return await this.assessmentModel.findByIdAndUpdate(user_asse._id,{category:this.categorySelector(mode)}, {new: true})
     } catch (error) {
       throw new HttpException(error?.message ? error.message : this.ISE,
         error?.status ? error.status : 500) 
