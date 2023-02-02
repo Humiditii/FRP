@@ -1,8 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res, UseGuards, Req } from '@nestjs/common';
 import { AssessmentService } from './assessment.service';
 import { CreateAssessmentDto, CreateQuestionDto, SubmitAnswersDto } from './dto/create-assessment.dto';
 import { UpdateAssessmentDto } from './dto/update-assessment.dto';
-import {Response} from 'express';
+import {Request, Response} from 'express';
 import { JwtAuthGuard } from '../guard/jwt.guard';
 import { RoleGuard } from 'src/guard/roles.guard';
 import { Roles } from 'src/guard/decorator/roles.decorator';
@@ -40,8 +40,10 @@ export class AssessmentController {
   @Post('/submit')
   async submitAssessment(
     @Body() submitAnswersDto:SubmitAnswersDto,
-    @Res() res:Response
+    @Res() res:Response,
+    @Req() req:any
     ):Promise<Response>{
+    submitAnswersDto.userId = req.user.userId
     const data =  await this.assessmentService.submitAssessment(submitAnswersDto);
     return res.status(201).json({
       message:"New question inserted",
