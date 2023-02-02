@@ -28,7 +28,7 @@ export class AuthController {
   ):Promise<Response>{
     const token = await this.authService.signin(signinDto)
     return res.status(200).json({
-      message:'New user created',
+      message:'User logged in!',
       data: {token}
     })
   }
