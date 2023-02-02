@@ -46,7 +46,7 @@ export class AssessmentController {
     submitAnswersDto.userId = req.user.userId
     const data =  await this.assessmentService.submitAssessment(submitAnswersDto);
     return res.status(201).json({
-      message:"New question inserted",
+      message:"Learning style determined!",
       data:data
     })
   }
