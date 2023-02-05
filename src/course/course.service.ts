@@ -1,26 +1,80 @@
-import { Injectable } from '@nestjs/common';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { HttpException, Injectable } from '@nestjs/common';
+import { CreateCourseDto, EnrollmentDto } from './dto/course.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Course, CourseDocument } from './schema/course.schema';
+import { Model } from 'mongoose';
+import { Enrollment, EnrollmentDocument } from './schema/enrolled.schema';
+import { Category, Level } from 'src/common/interfaces/category.enum';
 
 @Injectable()
 export class CourseService {
-  create(createCourseDto: CreateCourseDto) {
-    return 'This action adds a new course';
+  constructor(
+    @InjectModel(Course.name) private courseModel:Model<CourseDocument>,
+    @InjectModel(Enrollment.name) private enrollmentModel:Model<EnrollmentDocument>
+  ){}
+
+  private readonly ISE: string = 'Internal server error';
+
+  async uploadCourse(createCourseDto:CreateCourseDto):Promise<any>{
+    try {
+
+      for (const iterator in Level) {
+       if(!createCourseDto.courseContent?.[iterator]){
+        createCourseDto.courseContent[iterator] = {} 
+  
+        createCourseDto.courseContent[iterator as unknown as Level].dateAdded = new Date()
+       }
+       else{
+        createCourseDto.courseContent[iterator as unknown as Level].dateAdded = new Date()
+       }
+      
+      }
+    
+      return await this.courseModel.create(createCourseDto)
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
   }
 
-  findAll() {
-    return `This action returns all course`;
+  async viewCourses(learningStyle:Category):Promise<any>{
+    try {
+      return await this.courseModel.find({category:learningStyle}).lean()
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} course`;
+  async enroll(enrollmentDto:EnrollmentDto):Promise<any>{
+    try {
+      return await this.enrollmentModel.create(enrollmentDto)
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
   }
 
-  update(id: number, updateCourseDto: UpdateCourseDto) {
-    return `This action updates a #${id} course`;
+  async viewEnrolledCourses(userId:string):Promise<any>{
+    try {
+      return (await this.enrollmentModel.find({ userId:userId })).map( async (enroll_x:Enrollment) => {
+        return {
+          ...enroll_x,
+          courseName: (await this.courseModel.findById(enroll_x.courseId)).courseName
+        }
+      })
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} course`;
+  async deleteCourse(deleteDto: Omit<EnrollmentDto, 'proficiency'>):Promise<void>{
+    try {
+      await this.enrollmentModel.findOneAndDelete({deleteDto})
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
   }
 }
