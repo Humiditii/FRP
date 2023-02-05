@@ -57,12 +57,15 @@ export class CourseService {
 
   async viewEnrolledCourses(userId:string):Promise<any>{
     try {
-      return (await this.enrollmentModel.find({ userId:userId })).map( async (enroll_x:Enrollment) => {
+      
+      const enrollmentData = await this.enrollmentModel.find({ userId:userId }).lean()
+
+      return await Promise.all(enrollmentData.map( async (enroll_x:Enrollment) => {
         return {
           ...enroll_x,
           courseName: (await this.courseModel.findById(enroll_x.courseId)).courseName
         }
-      })
+      }))
     } catch (error) {
       throw new HttpException(error?.message ? error.message : this.ISE,
         error?.status ? error.status : 500) 
