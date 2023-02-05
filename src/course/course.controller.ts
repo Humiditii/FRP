@@ -1,34 +1,90 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Res, Query } from '@nestjs/common';
 import { CourseService } from './course.service';
-import { CreateCourseDto } from './dto/create-course.dto';
-import { UpdateCourseDto } from './dto/update-course.dto';
+import { CreateCourseDto, EnrollmentDto } from './dto/course.dto';
+import { JwtAuthGuard } from 'src/guard/jwt.guard';
+import { Response } from 'express';
+import { FrpRes } from 'src/common/interfaces/interfaces';
+import { Category } from 'src/common/interfaces/category.enum';
 
 @Controller('course')
+@UseGuards(JwtAuthGuard)
 export class CourseController {
   constructor(private readonly courseService: CourseService) {}
 
-  @Post()
-  create(@Body() createCourseDto: CreateCourseDto) {
-    return this.courseService.create(createCourseDto);
+  private resBody(message:string, status:number, data?:object):FrpRes{
+    return{
+      message: message ?? 'success!',
+      statusCode: status,
+      data:data ?? null
+    }
   }
 
-  @Get()
-  findAll() {
-    return this.courseService.findAll();
+  @Post('upload-course')
+  async create(
+    @Body() createCourseDto: CreateCourseDto,
+    @Req() req:any,
+    @Res() res:Response
+    ):Promise<Response>{
+
+    const data:Awaited<object> = await this.courseService.uploadCourse(createCourseDto)
+
+    return res.status(201).json(this.resBody('Course uploaded!',201,data))
+
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.courseService.findOne(+id);
+  @Get('view-courses')
+  async viewCourses(
+    @Res() res:Response,
+    @Query('learningStyle') learningStyle:Category
+  ):Promise<Response>{
+
+    const data: Awaited<object> =  await this.courseService.viewCourses(learningStyle)
+
+    return res.status(200).json(this.resBody('Course fetched!',200,data))
+
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCourseDto: UpdateCourseDto) {
-    return this.courseService.update(+id, updateCourseDto);
+  @Post('enroll')
+  async enroll(
+    @Body() enrollmentDto:EnrollmentDto,
+    @Res() res:Response,
+    @Req() req:any
+    ):Promise<Response>{
+
+      enrollmentDto.userId = req.user.userId
+
+      const data:Awaited<object> = await this.courseService.enroll(enrollmentDto)
+
+      return res.status(200).json(this.resBody('Enrolled for a new course!',201,data))
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.courseService.remove(+id);
+  @Get('enroll/view')
+  async viewEnrolledCourses(
+    @Req() req:any,
+    @Res() res:Response
+    ):Promise<Response>{
+
+      const data:Awaited<object> = await this.courseService.viewEnrolledCourses(req.user.userId)
+
+      return res.status(200).json(this.resBody('Enrolled courses fetched!',200,data))
+    
+  }
+
+  @Delete('enroll/delete/:courseId')
+  async deleteCourse(
+    @Param('courseId') courseId:string,
+    @Req() req:any,
+    @Res() res:Response
+  ):Promise<Response>{
+
+    function payload():Omit<EnrollmentDto, 'proficiency'>{
+      return {
+        userId:req.user.userId,
+        courseId:courseId
+      }
+    }
+    await this.courseService.deleteCourse(payload());
+
+    return res.status(200).json(this.resBody(`Deleted an enrolled course with id:${courseId}`,200))
   }
 }
