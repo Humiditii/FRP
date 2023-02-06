@@ -5,6 +5,9 @@ import { JwtAuthGuard } from 'src/guard/jwt.guard';
 import { Response } from 'express';
 import { FrpRes } from 'src/common/interfaces/interfaces';
 import { Category } from 'src/common/interfaces/category.enum';
+import { RoleGuard } from 'src/guard/roles.guard';
+import { Role } from 'src/guard/interface/role.enum';
+import { Roles } from 'src/guard/decorator/roles.decorator';
 
 @Controller('course')
 @UseGuards(JwtAuthGuard)
@@ -19,6 +22,8 @@ export class CourseController {
     }
   }
 
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
   @Post('upload-course')
   async create(
     @Body() createCourseDto: CreateCourseDto,
