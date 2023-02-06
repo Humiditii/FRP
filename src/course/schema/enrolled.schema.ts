@@ -16,6 +16,9 @@ export class Enrollment {
 
     @Prop()
     proficiency:Level
+
+    @Prop({default: new Date()})
+    enrolledDate:Date
 }
 
 
