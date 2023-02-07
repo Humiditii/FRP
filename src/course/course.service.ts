@@ -72,9 +72,18 @@ export class CourseService {
     }
   }
 
-  async deleteCourse(deleteDto: Omit<EnrollmentDto, 'proficiency'>):Promise<void>{
+  async deleteEnrolledCourse(deleteDto: Omit<EnrollmentDto, 'proficiency'>):Promise<void>{
     try {
       await this.enrollmentModel.findOneAndDelete({deleteDto})
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
+  }
+
+  async deleteCourse(courseId:string):Promise<void>{
+    try {
+      await this.courseModel.findByIdAndDelete(courseId)
     } catch (error) {
       throw new HttpException(error?.message ? error.message : this.ISE,
         error?.status ? error.status : 500) 

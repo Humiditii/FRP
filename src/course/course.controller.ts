@@ -75,8 +75,9 @@ export class CourseController {
     
   }
 
+  
   @Delete('enroll/delete/:courseId')
-  async deleteCourse(
+  async deleteEnrolledCourse(
     @Param('courseId') courseId:string,
     @Req() req:any,
     @Res() res:Response
@@ -88,8 +89,22 @@ export class CourseController {
         courseId:courseId
       }
     }
-    await this.courseService.deleteCourse(payload());
+    await this.courseService.deleteEnrolledCourse(payload());
 
-    return res.status(200).json(this.resBody(`Deleted an enrolled course with id:${courseId}`,200))
+    return res.status(200).json(this.resBody(`Deleted an enrolled course with id: ${courseId}`,200))
+  }
+
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
+  @Delete('delete/:courseId')
+  async deleteCourse(
+    @Param('courseId') courseId:string,
+    @Req() req:any,
+    @Res() res:Response
+  ):Promise<Response>{
+
+    await this.courseService.deleteCourse(courseId);
+
+    return res.status(200).json(this.resBody(`Deleted a course with id: ${courseId}`,200))
   }
 }
