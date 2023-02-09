@@ -81,7 +81,7 @@ export class AssessmentService {
     switch (option) {
       case 'a': return cat = Category.VISUAL;
       case 'b': return cat = Category.AUDITORY;
-      case 'c': return cat = Category.KINAESTHETIC;
+      case 'c': return cat = Category.KINESTHETIC;
       default:
         break;
     }
