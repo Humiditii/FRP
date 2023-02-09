@@ -22,7 +22,6 @@ export class AuthService {
 
   async signup(signupDto:SignupAuthDto):Promise<AuthDocument>{
     try {
-      console.log(signupDto)
       const user = await this.authModel.findOne({email:signupDto.email})
       if(user && user.verified === true ){
         const err:Err = {
