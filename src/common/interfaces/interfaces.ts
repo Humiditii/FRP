@@ -8,6 +8,7 @@ export interface CourseCont {
     dateAdded:Date
     content:string
     materialName:string
+    contentType:string
 
 }
 
