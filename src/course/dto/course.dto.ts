@@ -28,6 +28,17 @@ export class CourseAssessementDto{
 
 export class QuestionAnswerStruct {
   question:string
+  questionId:string
   answer:string
   options:string[]
+}
+
+export class CoursAssessementSubmitDto {
+  readonly courseId:string
+  readonly submission:AnswerStruct[]
+}
+
+class AnswerStruct {
+  readonly questionId:string
+  readonly answer:string
 }

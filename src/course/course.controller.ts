@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Req, UseGuards, Res, Query } from '@nestjs/common';
 import { CourseService } from './course.service';
-import { CreateCourseDto, EnrollmentDto } from './dto/course.dto';
+import { CoursAssessementSubmitDto, CourseAssessementDto, CreateCourseDto, EnrollmentDto } from './dto/course.dto';
 import { JwtAuthGuard } from 'src/guard/jwt.guard';
 import { Response } from 'express';
 import { FrpRes } from 'src/common/interfaces/interfaces';
@@ -107,4 +107,60 @@ export class CourseController {
 
     return res.status(200).json(this.resBody(`Deleted a course with id: ${courseId}`,200))
   }
+
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
+  @Post('assessement/create')
+  async createAssessement(
+    @Body() courseAssementDto:CourseAssessementDto,
+    @Req() req:any,
+    @Res() res:Response
+    ):Promise<Response>{
+
+    const data:Awaited<object> = await this.courseService.createAssessmentForCourse(courseAssementDto)
+
+    return res.status(201).json(this.resBody('Course assessement created!',201,data))
+
+  }
+
+  @Get('assessement/view/:courseId')
+  async viewCourseAsessement(
+    @Req() req:any,
+    @Res() res:Response,
+    @Param('courseId') courseId:string
+    ):Promise<Response>{
+
+      const data:Awaited<object> = await this.courseService.viewCourseAssessement(courseId)
+
+      return res.status(200).json(this.resBody('Course assessement fetched!',200,data))
+    
+  }
+
+  @UseGuards(RoleGuard)
+  @Roles(Role.Admin)
+  @Delete('assessement/delete/:courseId')
+  async deleteCourseAssessement(
+    @Param('courseId') courseId:string,
+    @Req() req:any,
+    @Res() res:Response
+  ):Promise<Response>{
+
+    await this.courseService.deleteCourseAssessement(courseId);
+
+    return res.status(200).json(this.resBody(`Deleted an assessement with id: ${courseId}`,200))
+  }
+
+  @Post('assessement/grade')
+  async gradeAssessement(
+    @Body() coursAssessementSubmitDto:CoursAssessementSubmitDto,
+    @Req() req:any,
+    @Res() res:Response
+    ):Promise<Response>{
+
+      const data:Awaited<object> = await this.courseService.gradeAssessement(coursAssessementSubmitDto)
+
+      return res.status(201).json(this.resBody('Course assessement graded!',201,data))
+    
+  }
+
 }

@@ -33,7 +33,7 @@ export class AuthService {
       }
       if(user && user.verified === false ){
         const err:Err = {
-          message: 'Please proceed to take the assessment!',
+          message: 'Please proceed to take the learning style assessment!',
           status: 400
         }
 
