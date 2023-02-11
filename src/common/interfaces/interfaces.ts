@@ -7,6 +7,8 @@ export interface Err {
 export interface CourseCont {
     dateAdded:Date
     content:string
+    materialName:string
+
 }
 
 export class FrpRes {

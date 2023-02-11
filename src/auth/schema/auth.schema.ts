@@ -9,6 +9,12 @@ export type AuthDocument = Auth & Document;
 export class Auth {
     @Prop({required:true})
     username:string
+
+    @Prop()
+    firstname:string
+
+    @Prop()
+    lastname:string
     
     @Prop({default:false})
     verified:boolean

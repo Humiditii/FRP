@@ -19,15 +19,15 @@ export class Course {
   @Prop(
     raw({
       [Level.Beginner]: {
-        type: Array<{ content: String; dateAdded: Date }>,
+        type: Array<{ content: String; dateAdded: Date, materialName:String }>,
         required: false,
       },
       [Level.Intermediate]: {
-        type: Array<{ content: String; dateAdded: Date }>,
+        type: Array<{ content: String; dateAdded: Date, materialName:String}>,
         required: false,
       },
       [Level.Expert]: {
-        type: Array<{ content: String; dateAdded: Date }>,
+        type: Array<{ content: String; dateAdded: Date, materialName:String}>,
         required: false,
       },
     }),

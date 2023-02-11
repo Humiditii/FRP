@@ -20,12 +20,17 @@ export class CourseService {
 
       for (const iterator in Level) {
        if(!createCourseDto.courseContent?.[iterator]){
-        createCourseDto.courseContent[iterator] = {} 
-  
-        createCourseDto.courseContent[iterator as unknown as Level].dateAdded = new Date()
+
+        createCourseDto.courseContent[iterator] = [{}]
+        for (const courseContX of createCourseDto.courseContent[iterator]) { 
+          courseContX.dateAdded = new Date()
+        }
+        
        }
        else{
-        createCourseDto.courseContent[iterator as unknown as Level].dateAdded = new Date()
+        for (const courseContX of createCourseDto.courseContent[iterator as unknown as Level]) {
+         courseContX.dateAdded = new Date()
+        }
        }
       
       }
@@ -89,4 +94,14 @@ export class CourseService {
         error?.status ? error.status : 500) 
     }
   }
+
+  async createAssessmentForCourse():Promise<any>{
+    try {
+      
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
+  }
+
 }
