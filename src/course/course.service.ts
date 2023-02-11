@@ -166,7 +166,9 @@ export class CourseService {
         }
       }
 
-      return (answersMem.reduce((a,b)=> a+b,0) / answersMem.length ) * 100
+      return {
+        score: `${(answersMem.reduce((a,b)=> a+b,0) / answersMem.length ) * 100}%`
+      }
 
     } catch (error) {
       console.log(error)
