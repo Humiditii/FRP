@@ -22,7 +22,7 @@ export class AuthService {
 
   private readonly ISE: string = 'Internal server error';
 
-  async signup(signupDto:SignupAuthDto):Promise<AuthDocument>{
+  async signup(signupDto:SignupAuthDto):Promise<{user:Partial<AuthDocument>, token:string}>{
     try {
       const user = await this.authModel.findOne({email:signupDto.email})
       if(user && user.verified === true ){
@@ -43,9 +43,18 @@ export class AuthService {
       }
 
       signupDto.password = hashSync(signupDto.password, genSaltSync())
-      const newUser = await new this.authModel(signupDto).save()
+      const {password, ...newUser} = await new this.authModel(signupDto).save()
 
-      return newUser
+      // generate jwt token
+      const payload:JwtPayload = {
+        userId:user._id,
+        role: user.role
+      }
+
+      return {
+        user: newUser,
+        token: this.jwtService.sign(payload)
+      }
 
     } catch (error) {
       throw new HttpException(error?.message ? error.message : this.ISE,
