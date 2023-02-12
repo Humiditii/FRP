@@ -55,6 +55,15 @@ export class AssessmentService {
     }
   }
 
+  async showLearningStyle(userId:string):Promise<Category>{
+    try {
+      return (await this.assessmentModel.findOne({user_id:userId}))?.category 
+    } catch (error) {
+      throw new HttpException(error?.message ? error.message : this.ISE,
+        error?.status ? error.status : 500) 
+    }
+  }
+
   private mode(array:string[]):string{
       if(array.length == 0)
           return null;

@@ -5,11 +5,13 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { Auth, AuthSchema } from './schema/auth.schema';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AssessmentModule } from 'src/assessment/assessment.module';
 
 @Module({
   controllers: [AuthController],
   providers: [AuthService],
   imports:[
+    AssessmentModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       useFactory: (configService:ConfigService) => ({
