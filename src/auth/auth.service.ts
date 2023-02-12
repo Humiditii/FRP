@@ -9,13 +9,15 @@ import {hashSync,genSaltSync,compareSync} from 'bcrypt';
 import { JwtService } from "@nestjs/jwt";
 import { JwtPayload } from 'src/guard/gaurd.interface';
 import { Role } from 'src/guard/interface/role.enum';
+import {AssessmentService} from '../assessment/assessment.service';
 
 @Injectable()
 export class AuthService {
 
   constructor(
     @InjectModel(Auth.name) private authModel:Model<AuthDocument>,
-    private jwtService: JwtService
+    private jwtService: JwtService,
+    private assesementService:AssessmentService
   ){}
 
   private readonly ISE: string = 'Internal server error';
@@ -51,9 +53,14 @@ export class AuthService {
     }
   }
 
-  async signin(signinDto:SignInAuthDto):Promise<string>{
+  async signin(signinDto:SignInAuthDto):Promise<object>{
     try {
       const user = await this.authModel.findOne({email:signinDto.email}).lean()
+
+      if(!user){
+        const err:Err = {message:'Invalid Email chief!',status:400}
+        throw new HttpException(err.message, err.status) 
+      }
 
       if(!compareSync(signinDto.password,user.password)){
         const err:Err = {message:'Invalid Password supplied!',status:400}
@@ -65,8 +72,18 @@ export class AuthService {
         userId:user._id,
         role: user.role
       }
+
+      const learningStyle = await this.assesementService.showLearningStyle(user._id) ?? null
+
+      if(learningStyle){
+        await this.authModel.findByIdAndUpdate(user._id,{verified:true})
+      }
+
       // token
-      return this.jwtService.sign(payload)
+      return {
+        token:this.jwtService.sign(payload),
+        learningStyle
+      }
 
     } catch (error) {
       throw new HttpException(error?.message ? error.message : this.ISE,
