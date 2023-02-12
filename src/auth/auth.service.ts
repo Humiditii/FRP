@@ -82,7 +82,11 @@ export class AuthService {
       // token
       return {
         token:this.jwtService.sign(payload),
-        learningStyle
+        learningStyle,
+        user:{
+          firstname:user?.firstname ?? '',
+          lastname: user?.lastname ?? ''
+        }
       }
 
     } catch (error) {
