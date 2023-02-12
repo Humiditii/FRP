@@ -26,10 +26,10 @@ export class AuthController {
     @Body() signinDto:SignInAuthDto,
     @Res() res:Response
   ):Promise<Response>{
-    const token = await this.authService.signin(signinDto)
+    const data = await this.authService.signin(signinDto)
     return res.status(200).json({
       message:'User logged in!',
-      data: {token}
+      data: data
     })
   }
 
