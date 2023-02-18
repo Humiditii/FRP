@@ -72,7 +72,7 @@ export class CourseService {
       return await Promise.all(enrollmentData.map( async (enroll_x:Enrollment) => {
         return {
           ...enroll_x,
-          courseName: (await this.courseModel.findById(enroll_x.courseId)).courseName
+          courseName: (await this.courseModel.findById(enroll_x.courseId))?.courseName
         }
       }))
     } catch (error) {
